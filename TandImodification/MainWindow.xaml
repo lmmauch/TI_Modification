@@ -1,0 +1,29 @@
+﻿<Window x:Class="TandImodification.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TandImodification"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu VerticalAlignment="Stretch">
+            <MenuItem Header="_File" VerticalAlignment="Stretch" Height="25">
+                <MenuItem Header="_Open CSV..." Click="MenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5">
+            <TextBlock Text="Run:" Margin="10,0,10,0"/>
+            <ComboBox Name="RunsComboBox" MinWidth="125" DisplayMemberPath="Name" SelectionChanged="RunsComboBox_SelectionChanged"/>
+        </StackPanel>
+
+        <ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" MouseDown="WpfPlot1_MouseDown" MouseUp="WpfPlot1_MouseUp" MouseMove="WpfPlot1_MouseMove"/>
+    </Grid>
+</Window>
