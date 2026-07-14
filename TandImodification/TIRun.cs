@@ -1,39 +1,52 @@
-﻿using Microsoft.Data.Analysis;
-using ScottPlot.Colormaps;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Data.Analysis;
 
 namespace TandImodification
 {
     public class TIRun
     {
-        public DataFrame OriginalData { get; set; }
+        // The loads plotted, in subplot order (2 rows x 3 columns).
+        public static readonly string[] Loads = ["CL", "CD", "CSF", "CPM", "CRM", "CYM"];
 
-        public DataFrame ModifiedData { get; set; }
+        private static readonly string[] SweepAngles = ["Alpha", "Psi", "Phi"];
 
-        public string SweepVariable { get; private set; }
+        public DataFrame OriginalData { get; }
 
-        public string Name { get; private set; }
+        public string SweepVariable { get; }
 
-        private static readonly List<string> sweepAngles = ["Alpha", "Psi", "Phi"];
+        public string Name { get; }
+
+        // Row indices (into OriginalData) the user has marked for exclusion.
+        public HashSet<int> ExcludedRows { get; } = [];
 
         public TIRun(string name, DataFrame data)
         {
             Name = name;
-
             OriginalData = data;
-            ModifiedData = data.Clone();
 
-            SweepVariable = sweepAngles.MaxBy(angle =>
-            { 
-                double[] values = [..OriginalData[angle].Cast<object>().Select(x => Convert.ToDouble(x ?? 0))];
+            // The sweep variable is whichever angle actually varies the most.
+            SweepVariable = SweepAngles.MaxBy(angle =>
+            {
+                double[] values = Column(angle);
                 double avg = values.Average();
-                double sumOfSquares = values.Sum(val => (val - avg) * (val - avg));
+                double sumOfSquares = values.Sum(v => (v - avg) * (v - avg));
                 return Math.Sqrt(sumOfSquares / values.Length);
             }) ?? "Alpha";
+        }
+
+        public int RowCount => (int)OriginalData.Rows.Count;
+
+        // Reads a column as doubles in row order (index j == row j).
+        public double[] Column(string name) =>
+            [.. OriginalData[name].Cast<object>().Select(x => Convert.ToDouble(x ?? 0))];
+
+        // The data that will actually be saved: original rows minus the excluded ones.
+        public DataFrame GetKeptData()
+        {
+            var keep = new BooleanDataFrameColumn("keep", RowCount);
+            for (int i = 0; i < RowCount; i++)
+                keep[i] = !ExcludedRows.Contains(i);
+
+            return OriginalData.Filter(keep);
         }
     }
 }

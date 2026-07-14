@@ -6,24 +6,71 @@
         xmlns:local="clr-namespace:TandImodification"
         xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        Background="#1E1E1E"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <SolidColorBrush x:Key="DarkPanel" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="DarkControl" Color="#3E3E42"/>
+        <SolidColorBrush x:Key="DarkBorder" Color="#555555"/>
+        <SolidColorBrush x:Key="DarkText" Color="#F0F0F0"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource DarkText}"/>
+        </Style>
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="{StaticResource DarkPanel}"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkText}"/>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource DarkText}"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource DarkControl}"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkText}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorder}"/>
+            <Setter Property="Padding" Value="6,2"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource DarkControl}"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkText}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorder}"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Menu VerticalAlignment="Stretch">
             <MenuItem Header="_File" VerticalAlignment="Stretch" Height="25">
-                <MenuItem Header="_Open CSV..." Click="MenuItem_Click"/>
+                <MenuItem Header="_Open Folder..." Click="MenuItem_Click"/>
+                <MenuItem Header="_Save Modified..." Click="SaveMenuItem_Click"/>
             </MenuItem>
         </Menu>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5">
-            <TextBlock Text="Run:" Margin="10,0,10,0"/>
-            <ComboBox Name="RunsComboBox" MinWidth="125" DisplayMemberPath="Name" SelectionChanged="RunsComboBox_SelectionChanged"/>
+            <TextBlock Text="Run:" VerticalAlignment="Center" Margin="10,0,6,0"/>
+            <Button Name="PrevButton" Content="◀" Padding="8,0" Click="PrevButton_Click"
+                    ToolTip="Previous run (PageUp)"/>
+            <ComboBox Name="RunsComboBox" MinWidth="150" Margin="4,0" DisplayMemberPath="Name"
+                      SelectionChanged="RunsComboBox_SelectionChanged"/>
+            <Button Name="NextButton" Content="▶" Padding="8,0" Click="NextButton_Click"
+                    ToolTip="Next run (PageDown)"/>
+            <Button Name="ClearButton" Content="Clear Exclusions" Margin="15,0,0,0" Padding="6,0" Click="ClearButton_Click"/>
+
+            <TextBlock Text="Size:" VerticalAlignment="Center" Margin="20,0,5,0"/>
+            <Slider Name="ScaleSlider" Width="110" VerticalAlignment="Center"
+                    Minimum="0.8" Maximum="2.5" Value="1" TickFrequency="0.1"
+                    IsSnapToTickEnabled="True" ValueChanged="ScaleSlider_ValueChanged"
+                    ToolTip="Make plot labels and markers larger or smaller"/>
         </StackPanel>
 
         <ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" MouseDown="WpfPlot1_MouseDown" MouseUp="WpfPlot1_MouseUp" MouseMove="WpfPlot1_MouseMove"/>
+
+        <TextBlock Name="StatusText" Grid.Row="3" Margin="10,3" Foreground="Gray"
+                   Text="Open a folder to begin. Left-drag to exclude points; right-drag to restore."/>
     </Grid>
 </Window>
